@@ -7,16 +7,16 @@ import java.util.List;
 public class Lecturer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Id")
+    @Column(name = "Id", nullable = false)
     private int id;
 
-    @Column(name = "Name")
+    @Column(name = "Name", length = 255, nullable = false)
     private String name;
 
     @Column(name = "Age")
     private int age;
 
-    @Column(name = "Description")
+    @Column(name = "Description", length = 600)
     private String description;
 
     @ManyToMany
