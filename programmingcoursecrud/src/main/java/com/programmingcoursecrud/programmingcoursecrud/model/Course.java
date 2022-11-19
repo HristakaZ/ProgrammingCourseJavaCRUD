@@ -34,4 +34,59 @@ public class Course {
     public Course() {
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Time getStartingTime() {
+        return startingTime;
+    }
+
+    public void setStartingTime(Time startingTime) {
+        this.startingTime = startingTime;
+    }
+
+    public Time getEndingTime() {
+        return endingTime;
+    }
+
+    public void setEndingTime(Time endingTime) {
+        this.endingTime = endingTime;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public List<Lecturer> getLecturers() {
+        return lecturers;
+    }
+
+    public void setLecturers(List<Lecturer> lecturers) {
+        this.lecturers = lecturers;
+    }
 }
