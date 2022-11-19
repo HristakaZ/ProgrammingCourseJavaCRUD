@@ -19,7 +19,7 @@ public class Lecturer {
     @Column(name = "Description", length = 600)
     private String description;
 
-    @OneToMany
+    @OneToMany(mappedBy = "lecturer")
     private List<Course> courses;
 
     public Lecturer() {
