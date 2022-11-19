@@ -27,9 +27,9 @@ public class Course {
     @Column(name = "DueDate")
     private Date dueDate;
 
-    @ManyToMany
-    @JoinColumn(name = "lecturerId") //should probably be PascalCase because that's how the column name is in the database
-    private List<Lecturer> lecturers;
+    @ManyToOne
+    @JoinColumn(name = "LecturerId") //should probably be PascalCase because that's how the column name is in the database
+    private Lecturer lecturer;
 
     public Course() {
     }
@@ -82,11 +82,11 @@ public class Course {
         this.dueDate = dueDate;
     }
 
-    public List<Lecturer> getLecturers() {
-        return lecturers;
+    public Lecturer getLecturer() {
+        return lecturer;
     }
 
-    public void setLecturers(List<Lecturer> lecturers) {
-        this.lecturers = lecturers;
+    public void setLecturer(Lecturer lecturer) {
+        this.lecturer = lecturer;
     }
 }

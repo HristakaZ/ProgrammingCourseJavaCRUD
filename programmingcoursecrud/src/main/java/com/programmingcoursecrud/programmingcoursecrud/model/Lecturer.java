@@ -19,8 +19,7 @@ public class Lecturer {
     @Column(name = "Description", length = 600)
     private String description;
 
-    @ManyToMany
-    @JoinColumn(name = "courseId")
+    @OneToMany
     private List<Course> courses;
 
     public Lecturer() {
