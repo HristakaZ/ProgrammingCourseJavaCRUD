@@ -20,8 +20,8 @@ public class LecturerController {
 
     @GetMapping("/getAll")
     public String getAll(Map<String, List<Lecturer>> model) {
-        List<Lecturer> lecturersAndTheirCourses = lecturerRepository.findAll();
-        model.put("lecturers", lecturersAndTheirCourses);
+        List<Lecturer> lecturers = lecturerRepository.findAll();
+        model.put("lecturers", lecturers);
         return "getAllLecturers";
     }
 

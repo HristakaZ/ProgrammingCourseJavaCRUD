@@ -1,7 +1,9 @@
 package com.programmingcoursecrud.programmingcoursecrud.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -22,7 +24,7 @@ public class Lecturer {
     private String description;
 
     @OneToMany(mappedBy = "lecturer")
-    private Set<Cours> courses = new LinkedHashSet<>();
+    private List<Course> courses = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -56,11 +58,11 @@ public class Lecturer {
         this.description = description;
     }
 
-    public Set<Cours> getCourses() {
+    public List<Course> getCourses() {
         return courses;
     }
 
-    public void setCourses(Set<Cours> courses) {
+    public void setCourses(List<Course> courses) {
         this.courses = courses;
     }
 
