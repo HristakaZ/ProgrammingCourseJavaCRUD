@@ -1,44 +1,41 @@
 package com.programmingcoursecrud.programmingcoursecrud.model;
 
 import javax.persistence.*;
-import java.sql.Date;
-import java.sql.Time;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
-@Entity(name = "courses")
-public class Course {
+@Entity
+@Table(name = "courses")
+public class Cours {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id", nullable = false)
-    private int id;
+    private Integer id;
 
-    @Column(name = "Name", length = 255, nullable = false)
+    @Column(name = "Name", nullable = false)
     private String name;
 
     @Column(name = "Description", length = 600)
     private String description;
 
     @Column(name = "StartingTime")
-    private Time startingTime;
+    private LocalTime startingTime;
 
     @Column(name = "EndingTime")
-    private Time endingTime;
+    private LocalTime endingTime;
 
     @Column(name = "DueDate")
-    private Date dueDate;
+    private LocalDate dueDate;
 
-    @ManyToOne
-    @JoinColumn(name = "LecturerId") //should probably be PascalCase because that's how the column name is in the database
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "LecturerId")
     private Lecturer lecturer;
 
-    public Course() {
-    }
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -58,27 +55,27 @@ public class Course {
         this.description = description;
     }
 
-    public Time getStartingTime() {
+    public LocalTime getStartingTime() {
         return startingTime;
     }
 
-    public void setStartingTime(Time startingTime) {
+    public void setStartingTime(LocalTime startingTime) {
         this.startingTime = startingTime;
     }
 
-    public Time getEndingTime() {
+    public LocalTime getEndingTime() {
         return endingTime;
     }
 
-    public void setEndingTime(Time endingTime) {
+    public void setEndingTime(LocalTime endingTime) {
         this.endingTime = endingTime;
     }
 
-    public Date getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -89,4 +86,5 @@ public class Course {
     public void setLecturer(Lecturer lecturer) {
         this.lecturer = lecturer;
     }
+
 }

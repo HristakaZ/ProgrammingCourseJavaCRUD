@@ -1,35 +1,34 @@
 package com.programmingcoursecrud.programmingcoursecrud.model;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-@Entity(name = "lecturers")
+@Entity
+@Table(name = "lecturers")
 public class Lecturer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id", nullable = false)
-    private int id;
+    private Integer id;
 
-    @Column(name = "Name", length = 255, nullable = false)
+    @Column(name = "Name", nullable = false)
     private String name;
 
     @Column(name = "Age")
-    private int age;
+    private Integer age;
 
     @Column(name = "Description", length = 600)
     private String description;
 
     @OneToMany(mappedBy = "lecturer")
-    private List<Course> courses;
+    private Set<Cours> courses = new LinkedHashSet<>();
 
-    public Lecturer() {
-    }
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -41,11 +40,11 @@ public class Lecturer {
         this.name = name;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
@@ -57,11 +56,12 @@ public class Lecturer {
         this.description = description;
     }
 
-    public List<Course> getCourses() {
+    public Set<Cours> getCourses() {
         return courses;
     }
 
-    public void setCourses(List<Course> courses) {
+    public void setCourses(Set<Cours> courses) {
         this.courses = courses;
     }
+
 }
