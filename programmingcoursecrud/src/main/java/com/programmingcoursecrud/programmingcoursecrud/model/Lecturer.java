@@ -1,26 +1,29 @@
 package com.programmingcoursecrud.programmingcoursecrud.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "lecturers")
 public class Lecturer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Id", nullable = false)
+    @Column(name = "Id")
     private Integer id;
 
     @Column(name = "Name", nullable = false)
+    @NotEmpty(message = "Name is required.")
     private String name;
 
     @Column(name = "Age")
+    @NotNull(message = "Age is required.")
+    @Min(value = 18, message = "The lecturer must be at least 18 years old.")
     private Integer age;
 
     @Column(name = "Description", length = 600)
+    @Size(min = 1, max = 600, message = "The description must be between 1 and 600 characters.")
     private String description;
 
     @OneToMany(mappedBy = "lecturer")

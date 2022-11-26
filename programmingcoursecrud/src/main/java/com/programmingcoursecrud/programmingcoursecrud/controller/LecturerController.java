@@ -1,9 +1,16 @@
 package com.programmingcoursecrud.programmingcoursecrud.controller;
 
+import com.programmingcoursecrud.programmingcoursecrud.model.Course;
 import com.programmingcoursecrud.programmingcoursecrud.model.Lecturer;
+import com.programmingcoursecrud.programmingcoursecrud.repositories.CourseRepository;
 import com.programmingcoursecrud.programmingcoursecrud.repositories.LecturerRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,9 +20,12 @@ import java.util.Optional;
 public class LecturerController {
 
     private final LecturerRepository lecturerRepository;
+    private final CourseRepository courseRepository;
 
-    public LecturerController(LecturerRepository lecturerRepository) {
+    public LecturerController(LecturerRepository lecturerRepository,
+                              CourseRepository courseRepository) {
         this.lecturerRepository = lecturerRepository;
+        this.courseRepository = courseRepository;
     }
 
     @GetMapping("/getAll")
@@ -25,19 +35,31 @@ public class LecturerController {
         return "getAllLecturers";
     }
 
-    @GetMapping("/getById/{id}")
-    public String getById(@PathVariable int id, @ModelAttribute("lecturer") Optional<Lecturer> lecturer) {
-        lecturer = lecturerRepository.findById(id);
+    @GetMapping("/getById")
+    public String getById(@RequestParam int id, Map<String, Lecturer> model) {
+        model.put("lecturer", lecturerRepository.findById(id).get());
         return "getLecturerById";
     }
 
-    @PostMapping("/create")
-    public String create(@ModelAttribute("lecturer") Lecturer lecturer) {
-        lecturerRepository.saveAndFlush(lecturer);
+    @GetMapping("/loadCreateForm")
+    public String loadCreateForm(ModelMap modelMap) {
+        modelMap.addAttribute("lecturer", new Lecturer());
         return "createLecturer";
     }
 
-    @PatchMapping("update")
+    @PostMapping("/create")
+    public String create(@Valid @ModelAttribute("lecturer") Lecturer lecturer,
+                         BindingResult bindingResult) {
+        lecturer.setCourses(new ArrayList<>());
+        if(bindingResult.hasErrors()) {
+            return "createLecturer";
+        }
+
+        lecturerRepository.saveAndFlush(lecturer);
+        return "redirect:/lecturer/getAll";
+    }
+
+    @PatchMapping("/update")
     public String update(@PathVariable Lecturer lecturer) {
         Optional<Lecturer> lecturerToUpdate = lecturerRepository.findById(lecturer.getId());
         lecturerToUpdate.get().setName(lecturer.getName());
@@ -47,13 +69,13 @@ public class LecturerController {
 
         lecturerRepository.saveAndFlush(lecturerToUpdate.get());
 
-        return "updateLecturer";
+        return "getAllLecturers";
     }
 
-    @DeleteMapping("delete")
+    @DeleteMapping("/delete")
     public String delete(@PathVariable int id) {
         lecturerRepository.deleteById(id);
 
-        return "deleteLecturer";
+        return "getAllLecturers";
     }
 }

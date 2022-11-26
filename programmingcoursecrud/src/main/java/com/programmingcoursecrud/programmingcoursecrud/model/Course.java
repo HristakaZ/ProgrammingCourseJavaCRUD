@@ -1,6 +1,9 @@
 package com.programmingcoursecrud.programmingcoursecrud.model;
 
+import com.sun.istack.NotNull;
+
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -9,13 +12,15 @@ import java.time.LocalTime;
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Id", nullable = false)
+    @Column(name = "Id")
     private Integer id;
 
     @Column(name = "Name", nullable = false)
+    @NotNull
     private String name;
 
     @Column(name = "Description", length = 600)
+    @Size(max = 600)
     private String description;
 
     @Column(name = "StartingTime")

@@ -14,25 +14,32 @@
 </head>
 <body>
     <h1 style="text-align: center; margin-top: 5%">Lecturers</h1>
-    <table class="table table-bordered" style="margin-top: 3%">
-        <thead class="table-primary">
+    <a href="loadCreateForm">Create Lecturer</a>
+    <table class="table table-bordered table-hover" style="margin-top: 3%">
+        <thead class="table table-primary">
         <tr>
             <th>Name</th>
             <th>Age</th>
             <th>Description</th>
             <th>Courses</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
         <c:forEach items="${lecturers}" var="lecturer">
             <tr>
-                <td class="table-success"><c:out value="${lecturer.name}"/></td>
-                <td class="table-light"><c:out value="${lecturer.age}"/></td>
-                <td class="table-secondary"><c:out value="${lecturer.description}"/></td>
+                <td><c:out value="${lecturer.name}"/></td>
+                <td><c:out value="${lecturer.age}"/></td>
+                <td><c:out value="${lecturer.description}"/></td>
                 <td class="table-warning">
                     <c:forEach items="${lecturer.courses}" var="course">
                         ${course.name};
                     </c:forEach>
+                </td>
+                <td>
+                    <a href="getById?id=${lecturer.id}">Details</a> |
+                    <a href="getById?id=${lecturer.id}">Update</a> |
+                    <a href="getById?id=${lecturer.id}">Details</a>
                 </td>
             </tr>
         </c:forEach>
