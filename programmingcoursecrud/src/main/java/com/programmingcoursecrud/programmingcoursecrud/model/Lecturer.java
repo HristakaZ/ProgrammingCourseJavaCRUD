@@ -26,7 +26,7 @@ public class Lecturer {
     @Size(min = 1, max = 600, message = "The description must be between 1 and 600 characters.")
     private String description;
 
-    @OneToMany(mappedBy = "lecturer")
+    @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL)
     private List<Course> courses = new ArrayList<>();
 
     public Integer getId() {

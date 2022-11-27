@@ -19,12 +19,9 @@ import java.util.Optional;
 public class LecturerController {
 
     private final LecturerRepository lecturerRepository;
-    private final CourseRepository courseRepository;
 
-    public LecturerController(LecturerRepository lecturerRepository,
-                              CourseRepository courseRepository) {
+    public LecturerController(LecturerRepository lecturerRepository) {
         this.lecturerRepository = lecturerRepository;
-        this.courseRepository = courseRepository;
     }
 
     @GetMapping("/getAll")
@@ -49,7 +46,6 @@ public class LecturerController {
     @PostMapping("/create")
     public String create(@Valid @ModelAttribute("lecturer") Lecturer lecturer,
                          BindingResult bindingResult) {
-        lecturer.setCourses(new ArrayList<>());
         if(bindingResult.hasErrors()) {
             return "createLecturer";
         }
