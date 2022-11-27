@@ -1,6 +1,5 @@
 package com.programmingcoursecrud.programmingcoursecrud.controller;
 
-import com.programmingcoursecrud.programmingcoursecrud.model.Course;
 import com.programmingcoursecrud.programmingcoursecrud.model.Lecturer;
 import com.programmingcoursecrud.programmingcoursecrud.repositories.CourseRepository;
 import com.programmingcoursecrud.programmingcoursecrud.repositories.LecturerRepository;
@@ -59,23 +58,40 @@ public class LecturerController {
         return "redirect:/lecturer/getAll";
     }
 
-    @PatchMapping("/update")
-    public String update(@PathVariable Lecturer lecturer) {
+    @GetMapping("/loadUpdateForm")
+    public String loadUpdateForm(@RequestParam int id, Map<String, Lecturer> model, ModelMap modelMap) {
+        modelMap.addAttribute("lecturer", new Lecturer());
+        model.put("lecturerToUpdate", lecturerRepository.findById(id).get());
+        return "updateLecturer";
+    }
+
+    @PostMapping("/update")
+    public String update(@Valid @ModelAttribute("lecturer") Lecturer lecturer,
+                         BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            return "updateLecturer";
+        }
         Optional<Lecturer> lecturerToUpdate = lecturerRepository.findById(lecturer.getId());
         lecturerToUpdate.get().setName(lecturer.getName());
         lecturerToUpdate.get().setAge(lecturer.getAge());
         lecturerToUpdate.get().setDescription(lecturer.getDescription());
-        lecturerToUpdate.get().setCourses(lecturer.getCourses());
 
         lecturerRepository.saveAndFlush(lecturerToUpdate.get());
 
-        return "getAllLecturers";
+        return "redirect:/lecturer/getAll";
     }
 
-    @DeleteMapping("/delete")
-    public String delete(@PathVariable int id) {
-        lecturerRepository.deleteById(id);
+    @GetMapping("/loadDeleteForm")
+    public String loadDeleteForm(@RequestParam int id, Map<String, Lecturer> model, ModelMap modelMap) {
+        modelMap.addAttribute("lecturer", new Lecturer());
+        model.put("lecturerToDelete", lecturerRepository.findById(id).get());
+        return "deleteLecturer";
+    }
 
-        return "getAllLecturers";
+    @PostMapping("/delete")
+    public String delete(@ModelAttribute("lecturer") Lecturer lecturer) {
+        lecturerRepository.deleteById(lecturer.getId());
+
+        return "redirect:/lecturer/getAll";
     }
 }

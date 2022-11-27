@@ -11,10 +11,18 @@
 <head>
     <title>Get All Lecturers</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        a {
+            text-decoration: none;
+            color: white;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1 style="text-align: center; margin-top: 5%">Lecturers</h1>
-    <a href="loadCreateForm">Create Lecturer</a>
+    <a href="loadCreateForm" class="btn btn-primary">Create Lecturer</a>
     <table class="table table-bordered table-hover" style="margin-top: 3%">
         <thead class="table table-primary">
         <tr>
@@ -31,15 +39,15 @@
                 <td><c:out value="${lecturer.name}"/></td>
                 <td><c:out value="${lecturer.age}"/></td>
                 <td><c:out value="${lecturer.description}"/></td>
-                <td class="table-warning">
+                <td>
                     <c:forEach items="${lecturer.courses}" var="course">
                         ${course.name};
                     </c:forEach>
                 </td>
-                <td>
-                    <a href="getById?id=${lecturer.id}">Details</a> |
-                    <a href="getById?id=${lecturer.id}">Update</a> |
-                    <a href="getById?id=${lecturer.id}">Details</a>
+                <td class="table-warning">
+                    <a href="getById?id=${lecturer.id}" class="btn btn-info">Details</a> |
+                    <a href="loadUpdateForm?id=${lecturer.id}" class="btn btn-warning">Update</a> |
+                    <a href="loadDeleteForm?id=${lecturer.id}" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
         </c:forEach>
