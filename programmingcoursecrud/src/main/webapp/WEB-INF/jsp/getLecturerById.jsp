@@ -60,7 +60,6 @@
     </div>
 </nav>
 <h3>Lecturer Details</h3>
-<h4>${userEmail != null ? 'Logged in as: '.concat(userEmail) : ''}</h4>
 <a href="getAll" class="btn btn-primary">Back to Lecturers</a>
 <table class="table table-bordered table-hover" style="margin-top: 3%">
     <thead class="table table-primary">

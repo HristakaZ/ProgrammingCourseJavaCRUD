@@ -61,7 +61,6 @@
     </div>
 </nav>
     <h1 style="text-align: center; margin-top: 5%">Courses</h1>
-    <h4>${userEmail != null ? 'Logged in as: '.concat(userEmail) : ''}</h4>
     <a href="loadCreateForm" class="btn btn-primary">Create Course</a>
     <table class="table table-bordered table-hover" style="margin-top: 3%">
       <thead class="table table-primary">

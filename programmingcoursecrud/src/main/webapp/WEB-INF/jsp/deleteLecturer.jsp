@@ -61,7 +61,6 @@
     </div>
 </nav>
     <h3>Are you sure you want to delete this lecturer?</h3>
-    <h4>${userEmail != null ? 'Logged in as: '.concat(userEmail) : ''}</h4>
     <a href="getAll" class="btn btn-primary">Back to Lecturers</a>
     <form:form method="POST"
                action="delete" modelAttribute="lecturer">

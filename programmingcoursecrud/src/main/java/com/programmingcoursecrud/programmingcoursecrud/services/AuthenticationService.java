@@ -1,6 +1,7 @@
 package com.programmingcoursecrud.programmingcoursecrud.services;
 
 
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -19,6 +20,19 @@ public class AuthenticationService {
         }
 
         return false;
+    }
+
+    public String hashPassword(String password) {
+        Argon2PasswordEncoder encoder = new Argon2PasswordEncoder(32,64,1,15*1024,2);
+
+        return encoder.encode(password);
+    }
+
+    public boolean isPasswordMatchingHashedPassword(String password) {
+        Argon2PasswordEncoder encoder = new Argon2PasswordEncoder(32,64,1,15*1024,2);
+        String hashedPassword = hashPassword(password);
+
+        return encoder.matches(password, hashedPassword);
     }
 
     public void login(String userEmail) {

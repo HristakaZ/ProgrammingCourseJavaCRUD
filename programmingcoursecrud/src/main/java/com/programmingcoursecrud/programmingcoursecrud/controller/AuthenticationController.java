@@ -33,7 +33,6 @@ public class AuthenticationController {
     public String loadRegisterForm(ModelMap modelMap,
                                    Map<String, String> userEmail) {
         modelMap.addAttribute("user", new User());
-        //authenticationService.logout();
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
@@ -49,7 +48,8 @@ public class AuthenticationController {
             return "register";
         }
 
-        //TO DO: hash password
+        String hashedPassword = authenticationService.hashPassword(user.getPassword());
+        user.setPassword(hashedPassword);
         userRepository.saveAndFlush(user);
         return "redirect:/course/getAll";
     }
@@ -68,8 +68,11 @@ public class AuthenticationController {
     @PostMapping("/login")
     public String login(@ModelAttribute("user") User user,
                         BindingResult bindingResult) {
-        //TO DO: hash password
-        User userFromDb = userRepository.findByEmailAndPassword(user.getEmail(), user.getPassword());
+        User userFromDb = new User();
+        if (authenticationService.isPasswordMatchingHashedPassword(user.getPassword())) {
+            userFromDb = userRepository.findByEmail(user.getEmail());
+        }
+
         if(userFromDb != null) {
             authenticationService.login(userFromDb.getEmail());
             return "redirect:/course/getAll";

@@ -73,7 +73,6 @@
   </div>
 </nav>
 <h3>Update Course</h3>
-<h4>${userEmail != null ? 'Logged in as: '.concat(userEmail) : ''}</h4>
 <a href="getAll" class="btn btn-primary">Back to Courses</a>
 <form:form method="POST"
            action="update" modelAttribute="course">
