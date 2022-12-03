@@ -31,11 +31,11 @@
         margin-bottom: 10px;
       }
 
-      #login, #logout {
+      #login, #logout, #register {
         margin: 10px;
       }
 
-      #loginText, #logoutText {
+      #loginText, #logoutText, #registerText {
         color: black;
       }
 
@@ -62,6 +62,7 @@
         </li>
       </ul>
       <p id="userEmail" style="margin-top: 15px">${userEmail != null ? 'Logged in as: '.concat(userEmail) : ''}</p>
+      ${userEmail == null ? '<button type="button" id="register" class="btn btn-info"><a id="registerText" href="../authentication/loadRegisterForm">Register</a></button>' : '' }
       <button type="button" id="login" class="btn btn-success">
         <a id="loginText" href="../authentication/loadLoginForm">
           Login
