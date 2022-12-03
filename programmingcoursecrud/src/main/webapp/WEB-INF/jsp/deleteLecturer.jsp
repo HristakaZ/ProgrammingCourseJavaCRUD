@@ -18,10 +18,49 @@
             margin-top: 10px;
             margin-bottom: 10px;
         }
+
+        #login, #logout {
+            margin: 10px;
+        }
+
+        #loginText, #logoutText {
+            color: black;
+        }
+
+        #userEmail {
+            font-weight: bold;
+            float: right;
+            color: black;
+        }
     </style>
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+    <div class="container-fluid">
+        <a class="navbar-brand">Programming Course CRUD</a>
+        <div class="collapse navbar-collapse" id="navbarColor03">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item active">
+                    <a class="nav-link" href="../course/getAll">Courses</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="getAll">Lecturers</a>
+                </li>
+                <li class="d-flex me-2">
+                </li>
+            </ul>
+            <p id="userEmail" style="margin-top: 15px">${userEmail != null ? 'Logged in as: '.concat(userEmail) : ''}</p>
+            <button type="button" id="login" class="btn btn-success">
+                <a id="loginText" href="../authentication/loadLoginForm">
+                    Login
+                </a>
+            </button>
+            ${userEmail != null ? '<button type="button" id="logout" class="btn btn-danger"><a id="logoutText" href="../authentication/logout">Logout</a></button>' : '' }
+        </div>
+    </div>
+</nav>
     <h3>Are you sure you want to delete this lecturer?</h3>
+    <h4>${userEmail != null ? 'Logged in as: '.concat(userEmail) : ''}</h4>
     <a href="getAll" class="btn btn-primary">Back to Lecturers</a>
     <form:form method="POST"
                action="delete" modelAttribute="lecturer">

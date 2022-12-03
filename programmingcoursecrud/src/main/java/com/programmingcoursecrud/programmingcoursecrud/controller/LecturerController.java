@@ -3,6 +3,7 @@ package com.programmingcoursecrud.programmingcoursecrud.controller;
 import com.programmingcoursecrud.programmingcoursecrud.model.Lecturer;
 import com.programmingcoursecrud.programmingcoursecrud.repositories.CourseRepository;
 import com.programmingcoursecrud.programmingcoursecrud.repositories.LecturerRepository;
+import com.programmingcoursecrud.programmingcoursecrud.services.AuthenticationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -19,33 +20,58 @@ import java.util.Optional;
 public class LecturerController {
 
     private final LecturerRepository lecturerRepository;
+    private final AuthenticationService authenticationService;
 
-    public LecturerController(LecturerRepository lecturerRepository) {
+    public LecturerController(LecturerRepository lecturerRepository,
+                              AuthenticationService authenticationService) {
         this.lecturerRepository = lecturerRepository;
+        this.authenticationService = authenticationService;
     }
 
     @GetMapping("/getAll")
-    public String getAll(Map<String, List<Lecturer>> model) {
+    public String getAll(Map<String, List<Lecturer>> model,
+                         Map<String, String> userEmail) {
+        if(authenticationService.isAuthenticated())
+        {
+            userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+        }
         List<Lecturer> lecturers = lecturerRepository.findAll();
         model.put("lecturers", lecturers);
         return "getAllLecturers";
     }
 
     @GetMapping("/getById")
-    public String getById(@RequestParam int id, Map<String, Lecturer> model) {
+    public String getById(@RequestParam int id,
+                          Map<String, Lecturer> model,
+                          Map<String, String> userEmail) {
+        if(authenticationService.isAuthenticated())
+        {
+            userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+        }
         model.put("lecturer", lecturerRepository.findById(id).get());
         return "getLecturerById";
     }
 
     @GetMapping("/loadCreateForm")
-    public String loadCreateForm(ModelMap modelMap) {
+    public String loadCreateForm(ModelMap modelMap,
+                                 Map<String, String> userEmail) {
+        if(authenticationService.isAuthenticated())
+        {
+            userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+        }
         modelMap.addAttribute("lecturer", new Lecturer());
         return "createLecturer";
     }
 
     @PostMapping("/create")
     public String create(@Valid @ModelAttribute("lecturer") Lecturer lecturer,
-                         BindingResult bindingResult) {
+                         BindingResult bindingResult,
+                         Map<String, String> userEmail) {
+        if(authenticationService.isAuthenticated())
+        {
+            userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+        }
+
         if(bindingResult.hasErrors()) {
             return "createLecturer";
         }
@@ -55,7 +81,14 @@ public class LecturerController {
     }
 
     @GetMapping("/loadUpdateForm")
-    public String loadUpdateForm(@RequestParam int id, Map<String, Lecturer> model, ModelMap modelMap) {
+    public String loadUpdateForm(@RequestParam int id,
+                                 Map<String, Lecturer> model,
+                                 ModelMap modelMap,
+                                 Map<String, String> userEmail) {
+        if(authenticationService.isAuthenticated())
+        {
+            userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+        }
         modelMap.addAttribute("lecturer", new Lecturer());
         model.put("lecturerToUpdate", lecturerRepository.findById(id).get());
         return "updateLecturer";
@@ -63,7 +96,13 @@ public class LecturerController {
 
     @PostMapping("/update")
     public String update(@Valid @ModelAttribute("lecturer") Lecturer lecturer,
-                         BindingResult bindingResult) {
+                         BindingResult bindingResult,
+                         Map<String, String> userEmail) {
+        if(authenticationService.isAuthenticated())
+        {
+            userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+        }
+
         if(bindingResult.hasErrors()) {
             return "updateLecturer";
         }
@@ -78,7 +117,14 @@ public class LecturerController {
     }
 
     @GetMapping("/loadDeleteForm")
-    public String loadDeleteForm(@RequestParam int id, Map<String, Lecturer> model, ModelMap modelMap) {
+    public String loadDeleteForm(@RequestParam int id,
+                                 Map<String, Lecturer> model,
+                                 ModelMap modelMap,
+                                 Map<String, String> userEmail) {
+        if(authenticationService.isAuthenticated())
+        {
+            userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+        }
         modelMap.addAttribute("lecturer", new Lecturer());
         model.put("lecturerToDelete", lecturerRepository.findById(id).get());
         return "deleteLecturer";

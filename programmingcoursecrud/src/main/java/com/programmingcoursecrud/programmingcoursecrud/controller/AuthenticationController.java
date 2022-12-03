@@ -2,6 +2,7 @@ package com.programmingcoursecrud.programmingcoursecrud.controller;
 
 import com.programmingcoursecrud.programmingcoursecrud.model.User;
 import com.programmingcoursecrud.programmingcoursecrud.repositories.UserRepository;
+import com.programmingcoursecrud.programmingcoursecrud.services.AuthenticationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -20,22 +21,24 @@ import java.util.Map;
 public class AuthenticationController {
 
     private final UserRepository userRepository;
-    private HttpSession httpSession;
+    private AuthenticationService authenticationService;
 
     public AuthenticationController(UserRepository userRepository,
-                                    HttpSession httpSession) {
+                                    AuthenticationService authenticationService) {
         this.userRepository = userRepository;
-        this.httpSession = httpSession;
+        this.authenticationService = authenticationService;
     }
 
     @GetMapping("/loadRegisterForm")
     public String loadRegisterForm(ModelMap modelMap,
                                    Map<String, String> userEmail) {
         modelMap.addAttribute("user", new User());
-        if(httpSession.getAttribute("userEmail") != null)
+        //authenticationService.logout();
+        if(authenticationService.isAuthenticated())
         {
-            userEmail.put("userEmail", httpSession.getAttribute("userEmail").toString());
+            userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
         }
+
         return "register";
     }
 
@@ -52,19 +55,23 @@ public class AuthenticationController {
     }
 
     @GetMapping("/loadLoginForm")
-    public String loadLoginForm(ModelMap modelMap) {
+    public String loadLoginForm(ModelMap modelMap, Map<String, String> userEmail) {
         modelMap.addAttribute("user", new User());
+        if(authenticationService.isAuthenticated())
+        {
+            userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+        }
+
         return "login";
     }
 
     @PostMapping("/login")
     public String login(@ModelAttribute("user") User user,
-                        BindingResult bindingResult,
-                        Map<String, String> userEmail) {
+                        BindingResult bindingResult) {
         //TO DO: hash password
         User userFromDb = userRepository.findByEmailAndPassword(user.getEmail(), user.getPassword());
         if(userFromDb != null) {
-            httpSession.setAttribute("userEmail", userFromDb.getEmail());
+            authenticationService.login(userFromDb.getEmail());
             return "redirect:/course/getAll";
         }
 
@@ -72,9 +79,9 @@ public class AuthenticationController {
         return "login";
     }
 
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     public String logout() {
-        httpSession.setAttribute("userEmail", null);
+        authenticationService.logout();
         return "redirect:/course/getAll";
     }
 }
