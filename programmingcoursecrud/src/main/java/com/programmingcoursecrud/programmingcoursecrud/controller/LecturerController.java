@@ -1,19 +1,21 @@
 package com.programmingcoursecrud.programmingcoursecrud.controller;
 
+import com.mysql.cj.util.StringUtils;
+import com.programmingcoursecrud.programmingcoursecrud.model.Course;
 import com.programmingcoursecrud.programmingcoursecrud.model.Lecturer;
+import com.programmingcoursecrud.programmingcoursecrud.model.SearchCriteria;
 import com.programmingcoursecrud.programmingcoursecrud.repositories.CourseRepository;
 import com.programmingcoursecrud.programmingcoursecrud.repositories.LecturerRepository;
 import com.programmingcoursecrud.programmingcoursecrud.services.AuthenticationService;
+import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Supplier;
 
 @Controller
 @RequestMapping("/lecturer")
@@ -30,13 +32,60 @@ public class LecturerController {
 
     @GetMapping("/getAll")
     public String getAll(Map<String, List<Lecturer>> model,
-                         Map<String, String> userEmail) {
+                         Map<String, String> userEmail,
+                         ModelMap modelMap) {
+        modelMap.addAttribute("searchCriteria", new SearchCriteria());
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
         }
         List<Lecturer> lecturers = lecturerRepository.findAll();
         model.put("lecturers", lecturers);
+        return "getAllLecturers";
+    }
+
+    @PostMapping("/search")
+    public String search(Map<String, List<Lecturer>> model,
+                         Map<String, String> userEmail,
+                         @ModelAttribute("searchCriteria") SearchCriteria searchCriteria) {
+        Map<String, Supplier<List<Lecturer>>> criteriaToSearchBy = new HashMap<>();
+        criteriaToSearchBy.put("name", new Supplier<List<Lecturer>>() {
+            @Override
+            public List<Lecturer> get() {
+                return lecturerRepository.findLecturersByName(searchCriteria.getSearch());
+            }
+        });
+
+        criteriaToSearchBy.put("age", new Supplier<List<Lecturer>>() {
+            @Override
+            public List<Lecturer> get() {
+                return lecturerRepository.findLecturersByAge(Integer.parseInt(searchCriteria.getSearch()));
+            }
+        });
+
+        criteriaToSearchBy.put("description", new Supplier<List<Lecturer>>() {
+            @Override
+            public List<Lecturer> get() {
+                return lecturerRepository.findLecturersByDescription(searchCriteria.getSearch());
+            }
+        });
+
+        if(authenticationService.isAuthenticated()) {
+            userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+        }
+
+        List<Lecturer> lecturers = new ArrayList<>();
+        if(!StringUtils.isEmptyOrWhitespaceOnly(searchCriteria.getSearch()) &&
+                !StringUtils.isEmptyOrWhitespaceOnly(searchCriteria.getCriteria())) {
+            if (criteriaToSearchBy.containsKey(searchCriteria.getCriteria())) {
+                lecturers = criteriaToSearchBy.get(searchCriteria.getCriteria()).get();
+            }
+        }
+        else {
+            lecturers = lecturerRepository.findAll();
+        }
+        model.put("lecturers", lecturers);
+
         return "getAllLecturers";
     }
 

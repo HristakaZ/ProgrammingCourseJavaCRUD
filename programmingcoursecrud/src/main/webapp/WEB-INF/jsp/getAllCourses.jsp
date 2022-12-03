@@ -7,6 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
 <head>
     <title>Get All Courses</title>
@@ -61,6 +62,21 @@
     </div>
 </nav>
     <h1 style="text-align: center; margin-top: 5%">Courses</h1>
+    <br>
+    <div style="width: 50%; margin: 0 auto;">
+        <form:form method="POST"
+                   action="search" modelAttribute="searchCriteria">
+            <form:input path="search" cssClass="form-control mr-sm-2" placeholder="Search" />
+            <span>
+                <form:radiobutton cssClass="form-check-input" path="criteria" value="name" label="Name" />
+                <form:radiobutton cssClass="form-check-input" path="criteria" value="description" label="Description" />
+            </span>
+            <br>
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" style="float: right">Search</button>
+        </form:form>
+    </div>
+    <br>
+    <br>
     <a href="loadCreateForm" class="btn btn-primary">Create Course</a>
     <table class="table table-bordered table-hover" style="margin-top: 3%">
       <thead class="table table-primary">
