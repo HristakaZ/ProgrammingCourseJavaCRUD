@@ -37,51 +37,53 @@ public class CourseController {
     public String getAll(Map<String, List<Course>> model,
                          Map<String, String> userEmail,
                          ModelMap modelMap) {
-        modelMap.addAttribute("searchCriteria", new SearchCriteria());
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+            modelMap.addAttribute("searchCriteria", new SearchCriteria());
+            List<Course> courses = courseRepository.findAll();
+            model.put("courses", courses);
+            return "getAllCourses";
         }
-        List<Course> courses = courseRepository.findAll();
-        model.put("courses", courses);
-        return "getAllCourses";
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @PostMapping("/search")
     public String search(Map<String, List<Course>> model,
                          Map<String, String> userEmail,
                          @ModelAttribute("searchCriteria") SearchCriteria searchCriteria) {
-        Map<String, Supplier<List<Course>>> criteriaToSearchBy = new HashMap<>();
-        criteriaToSearchBy.put("name", new Supplier<List<Course>>() {
-            @Override
-            public List<Course> get() {
-                return courseRepository.findCoursesByName(searchCriteria.getSearch());
-            }
-        });
-        criteriaToSearchBy.put("description", new Supplier<List<Course>>() {
-            @Override
-            public List<Course> get() {
-                return courseRepository.findCoursesByDescription(searchCriteria.getSearch());
-            }
-        });
-
         if(authenticationService.isAuthenticated()) {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
-        }
-
-        List<Course> courses = new ArrayList<>();
-        if(!StringUtils.isEmptyOrWhitespaceOnly(searchCriteria.getSearch()) &&
-            !StringUtils.isEmptyOrWhitespaceOnly(searchCriteria.getCriteria())) {
-            if(criteriaToSearchBy.containsKey(searchCriteria.getCriteria())) {
-                courses = criteriaToSearchBy.get(searchCriteria.getCriteria()).get();
+            Map<String, Supplier<List<Course>>> criteriaToSearchBy = new HashMap<>();
+            criteriaToSearchBy.put("name", new Supplier<List<Course>>() {
+                @Override
+                public List<Course> get() {
+                    return courseRepository.findCoursesByName(searchCriteria.getSearch());
+                }
+            });
+            criteriaToSearchBy.put("description", new Supplier<List<Course>>() {
+                @Override
+                public List<Course> get() {
+                    return courseRepository.findCoursesByDescription(searchCriteria.getSearch());
+                }
+            });
+            List<Course> courses = new ArrayList<>();
+            if(!StringUtils.isEmptyOrWhitespaceOnly(searchCriteria.getSearch()) &&
+                    !StringUtils.isEmptyOrWhitespaceOnly(searchCriteria.getCriteria())) {
+                if(criteriaToSearchBy.containsKey(searchCriteria.getCriteria())) {
+                    courses = criteriaToSearchBy.get(searchCriteria.getCriteria()).get();
+                }
             }
-        }
-        else {
-            courses = courseRepository.findAll();
-        }
-        model.put("courses", courses);
+            else {
+                courses = courseRepository.findAll();
+            }
+            model.put("courses", courses);
 
-        return "getAllCourses";
+            return "getAllCourses";
+        }
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @GetMapping("/getById")
@@ -91,9 +93,11 @@ public class CourseController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+            model.put("course", courseRepository.findById(id).get());
+            return "getCourseById";
         }
-        model.put("course", courseRepository.findById(id).get());
-        return "getCourseById";
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @GetMapping("/loadCreateForm")
@@ -103,10 +107,12 @@ public class CourseController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+            modelMap.addAttribute("course", new Course());
+            lecturers.put("lecturers", lecturerRepository.findAll());
+            return "createCourse";
         }
-        modelMap.addAttribute("course", new Course());
-        lecturers.put("lecturers", lecturerRepository.findAll());
-        return "createCourse";
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @PostMapping("/create")
@@ -117,14 +123,16 @@ public class CourseController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
-        }
-        lecturers.put("lecturers", lecturerRepository.findAll());
-        if(bindingResult.hasErrors()) {
-            return "createCourse";
+            lecturers.put("lecturers", lecturerRepository.findAll());
+            if(bindingResult.hasErrors()) {
+                return "createCourse";
+            }
+
+            courseRepository.saveAndFlush(course);
+            return "redirect:/course/getAll";
         }
 
-        courseRepository.saveAndFlush(course);
-        return "redirect:/course/getAll";
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @GetMapping("/loadUpdateForm")
@@ -136,11 +144,13 @@ public class CourseController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+            modelMap.addAttribute("course", new Course());
+            model.put("courseToUpdate", courseRepository.findById(id).get());
+            lecturers.put("lecturers", getUnselectedLecturers(id));
+            return "updateCourse";
         }
-        modelMap.addAttribute("course", new Course());
-        model.put("courseToUpdate", courseRepository.findById(id).get());
-        lecturers.put("lecturers", getUnselectedLecturers(id));
-        return "updateCourse";
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @PostMapping("/update")
@@ -152,20 +162,22 @@ public class CourseController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
-        }
-        model.put("courseToUpdate", courseRepository.findById(course.getId()).get());
-        lecturers.put("lecturers", getUnselectedLecturers(course.getId()));
-        if(bindingResult.hasErrors()) {
-            return "updateCourse";
-        }
-        Optional<Course> courseToUpdate = courseRepository.findById(course.getId());
-        courseToUpdate.get().setName(course.getName());
-        courseToUpdate.get().setDescription(course.getDescription());
-        courseToUpdate.get().setLecturer(course.getLecturer());
+            model.put("courseToUpdate", courseRepository.findById(course.getId()).get());
+            lecturers.put("lecturers", getUnselectedLecturers(course.getId()));
+            if(bindingResult.hasErrors()) {
+                return "updateCourse";
+            }
+            Optional<Course> courseToUpdate = courseRepository.findById(course.getId());
+            courseToUpdate.get().setName(course.getName());
+            courseToUpdate.get().setDescription(course.getDescription());
+            courseToUpdate.get().setLecturer(course.getLecturer());
 
-        courseRepository.saveAndFlush(courseToUpdate.get());
+            courseRepository.saveAndFlush(courseToUpdate.get());
 
-        return "redirect:/course/getAll";
+            return "redirect:/course/getAll";
+        }
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @GetMapping("/loadDeleteForm")
@@ -176,17 +188,22 @@ public class CourseController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+            modelMap.addAttribute("course", new Course());
+            model.put("courseToDelete", courseRepository.findById(id).get());
+            return "deleteCourse";
         }
-        modelMap.addAttribute("course", new Course());
-        model.put("courseToDelete", courseRepository.findById(id).get());
-        return "deleteCourse";
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @PostMapping("/delete")
     public String delete(@ModelAttribute("course") Course course) {
-        courseRepository.deleteById(course.getId());
+        if(authenticationService.isAuthenticated()) {
+            courseRepository.deleteById(course.getId());
+            return "redirect:/course/getAll";
+        }
 
-        return "redirect:/course/getAll";
+        return "redirect:/authentication/loadLoginForm";
     }
 
     private List<Lecturer> getUnselectedLecturers(int id) {

@@ -34,59 +34,61 @@ public class LecturerController {
     public String getAll(Map<String, List<Lecturer>> model,
                          Map<String, String> userEmail,
                          ModelMap modelMap) {
-        modelMap.addAttribute("searchCriteria", new SearchCriteria());
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+            modelMap.addAttribute("searchCriteria", new SearchCriteria());
+            List<Lecturer> lecturers = lecturerRepository.findAll();
+            model.put("lecturers", lecturers);
+            return "getAllLecturers";
         }
-        List<Lecturer> lecturers = lecturerRepository.findAll();
-        model.put("lecturers", lecturers);
-        return "getAllLecturers";
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @PostMapping("/search")
     public String search(Map<String, List<Lecturer>> model,
                          Map<String, String> userEmail,
                          @ModelAttribute("searchCriteria") SearchCriteria searchCriteria) {
-        Map<String, Supplier<List<Lecturer>>> criteriaToSearchBy = new HashMap<>();
-        criteriaToSearchBy.put("name", new Supplier<List<Lecturer>>() {
-            @Override
-            public List<Lecturer> get() {
-                return lecturerRepository.findLecturersByName(searchCriteria.getSearch());
-            }
-        });
-
-        criteriaToSearchBy.put("age", new Supplier<List<Lecturer>>() {
-            @Override
-            public List<Lecturer> get() {
-                return lecturerRepository.findLecturersByAge(Integer.parseInt(searchCriteria.getSearch()));
-            }
-        });
-
-        criteriaToSearchBy.put("description", new Supplier<List<Lecturer>>() {
-            @Override
-            public List<Lecturer> get() {
-                return lecturerRepository.findLecturersByDescription(searchCriteria.getSearch());
-            }
-        });
-
         if(authenticationService.isAuthenticated()) {
+            Map<String, Supplier<List<Lecturer>>> criteriaToSearchBy = new HashMap<>();
+            criteriaToSearchBy.put("name", new Supplier<List<Lecturer>>() {
+                @Override
+                public List<Lecturer> get() {
+                    return lecturerRepository.findLecturersByName(searchCriteria.getSearch());
+                }
+            });
+
+            criteriaToSearchBy.put("age", new Supplier<List<Lecturer>>() {
+                @Override
+                public List<Lecturer> get() {
+                    return lecturerRepository.findLecturersByAge(Integer.parseInt(searchCriteria.getSearch()));
+                }
+            });
+
+            criteriaToSearchBy.put("description", new Supplier<List<Lecturer>>() {
+                @Override
+                public List<Lecturer> get() {
+                    return lecturerRepository.findLecturersByDescription(searchCriteria.getSearch());
+                }
+            });
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
-        }
-
-        List<Lecturer> lecturers = new ArrayList<>();
-        if(!StringUtils.isEmptyOrWhitespaceOnly(searchCriteria.getSearch()) &&
-                !StringUtils.isEmptyOrWhitespaceOnly(searchCriteria.getCriteria())) {
-            if (criteriaToSearchBy.containsKey(searchCriteria.getCriteria())) {
-                lecturers = criteriaToSearchBy.get(searchCriteria.getCriteria()).get();
+            List<Lecturer> lecturers = new ArrayList<>();
+            if(!StringUtils.isEmptyOrWhitespaceOnly(searchCriteria.getSearch()) &&
+                    !StringUtils.isEmptyOrWhitespaceOnly(searchCriteria.getCriteria())) {
+                if (criteriaToSearchBy.containsKey(searchCriteria.getCriteria())) {
+                    lecturers = criteriaToSearchBy.get(searchCriteria.getCriteria()).get();
+                }
             }
-        }
-        else {
-            lecturers = lecturerRepository.findAll();
-        }
-        model.put("lecturers", lecturers);
+            else {
+                lecturers = lecturerRepository.findAll();
+            }
+            model.put("lecturers", lecturers);
 
-        return "getAllLecturers";
+            return "getAllLecturers";
+        }
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @GetMapping("/getById")
@@ -96,9 +98,11 @@ public class LecturerController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+            model.put("lecturer", lecturerRepository.findById(id).get());
+            return "getLecturerById";
         }
-        model.put("lecturer", lecturerRepository.findById(id).get());
-        return "getLecturerById";
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @GetMapping("/loadCreateForm")
@@ -107,9 +111,11 @@ public class LecturerController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+            modelMap.addAttribute("lecturer", new Lecturer());
+            return "createLecturer";
         }
-        modelMap.addAttribute("lecturer", new Lecturer());
-        return "createLecturer";
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @PostMapping("/create")
@@ -119,14 +125,16 @@ public class LecturerController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+
+            if(bindingResult.hasErrors()) {
+                return "createLecturer";
+            }
+
+            lecturerRepository.saveAndFlush(lecturer);
+            return "redirect:/lecturer/getAll";
         }
 
-        if(bindingResult.hasErrors()) {
-            return "createLecturer";
-        }
-
-        lecturerRepository.saveAndFlush(lecturer);
-        return "redirect:/lecturer/getAll";
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @GetMapping("/loadUpdateForm")
@@ -137,10 +145,12 @@ public class LecturerController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+            modelMap.addAttribute("lecturer", new Lecturer());
+            model.put("lecturerToUpdate", lecturerRepository.findById(id).get());
+            return "updateLecturer";
         }
-        modelMap.addAttribute("lecturer", new Lecturer());
-        model.put("lecturerToUpdate", lecturerRepository.findById(id).get());
-        return "updateLecturer";
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @PostMapping("/update")
@@ -150,19 +160,20 @@ public class LecturerController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+            if(bindingResult.hasErrors()) {
+                return "updateLecturer";
+            }
+            Optional<Lecturer> lecturerToUpdate = lecturerRepository.findById(lecturer.getId());
+            lecturerToUpdate.get().setName(lecturer.getName());
+            lecturerToUpdate.get().setAge(lecturer.getAge());
+            lecturerToUpdate.get().setDescription(lecturer.getDescription());
+
+            lecturerRepository.saveAndFlush(lecturerToUpdate.get());
+
+            return "redirect:/lecturer/getAll";
         }
 
-        if(bindingResult.hasErrors()) {
-            return "updateLecturer";
-        }
-        Optional<Lecturer> lecturerToUpdate = lecturerRepository.findById(lecturer.getId());
-        lecturerToUpdate.get().setName(lecturer.getName());
-        lecturerToUpdate.get().setAge(lecturer.getAge());
-        lecturerToUpdate.get().setDescription(lecturer.getDescription());
-
-        lecturerRepository.saveAndFlush(lecturerToUpdate.get());
-
-        return "redirect:/lecturer/getAll";
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @GetMapping("/loadDeleteForm")
@@ -173,16 +184,21 @@ public class LecturerController {
         if(authenticationService.isAuthenticated())
         {
             userEmail.put("userEmail", authenticationService.getAuthenticatedUserEmail());
+            modelMap.addAttribute("lecturer", new Lecturer());
+            model.put("lecturerToDelete", lecturerRepository.findById(id).get());
+            return "deleteLecturer";
         }
-        modelMap.addAttribute("lecturer", new Lecturer());
-        model.put("lecturerToDelete", lecturerRepository.findById(id).get());
-        return "deleteLecturer";
+
+        return "redirect:/authentication/loadLoginForm";
     }
 
     @PostMapping("/delete")
     public String delete(@ModelAttribute("lecturer") Lecturer lecturer) {
-        lecturerRepository.deleteById(lecturer.getId());
+        if(authenticationService.isAuthenticated()) {
+            lecturerRepository.deleteById(lecturer.getId());
+            return "redirect:/lecturer/getAll";
+        }
 
-        return "redirect:/lecturer/getAll";
+        return "redirect:/authentication/loadLoginForm";
     }
 }
